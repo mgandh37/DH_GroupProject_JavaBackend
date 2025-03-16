@@ -17,21 +17,43 @@ import java.util.Map;
 
 @Repository
 public class StaffRepository {
-	private SimpleJdbcCall jdbcCall;
+	private final SimpleJdbcCall staffInfoCall;
+    private final SimpleJdbcCall staffTerminateCall;
+    private final SimpleJdbcCall staffHire;
 
     @Autowired
     public StaffRepository(DataSource dataSource) {
-        this.jdbcCall = new SimpleJdbcCall(dataSource)
+        this.staffInfoCall = new SimpleJdbcCall(dataSource)
                 .withCatalogName("") // Oracle does not require a catalog
                 .withProcedureName("STAFF_INFO_SP")
                 .declareParameters(
                         new SqlParameter("p_staffno", Types.VARCHAR),
                         new SqlOutParameter("p_rc", Types.REF_CURSOR)
                 );
+        this.staffTerminateCall = new SimpleJdbcCall(dataSource)
+                .withProcedureName("STAFF_TERMINATE_SP")
+                .declareParameters(
+                        new SqlParameter("p_staffno", Types.VARCHAR)
+                );
+        this.staffHire = new SimpleJdbcCall(dataSource)
+                .withProcedureName("STAFF_HIRE_SP") // Call stored procedure
+                .declareParameters(
+                		new SqlParameter("p_staffno", Types.VARCHAR),
+                        new SqlParameter("p_fname", Types.VARCHAR),
+                        new SqlParameter("p_lname", Types.VARCHAR),
+                        new SqlParameter("p_position", Types.VARCHAR),
+                        new SqlParameter("p_sex", Types.VARCHAR),
+                        new SqlParameter("p_dob", Types.DATE),
+                        new SqlParameter("p_salary", Types.DOUBLE),
+                        new SqlParameter("p_branchno", Types.VARCHAR),
+                        new SqlParameter("p_telephone", Types.VARCHAR),
+                        new SqlParameter("p_mobile", Types.VARCHAR),
+                        new SqlParameter("p_email", Types.VARCHAR)
+                );
     }
 
     public List<Staff> callStaffInfoSp(String staffno) {
-        Map<String, Object> result = jdbcCall.execute(staffno);
+        Map<String, Object> result = staffInfoCall.execute(staffno);
 
         List<Map<String, Object>> rows = (List<Map<String, Object>>) result.get("p_rc");
         List<Staff> staffList = new ArrayList<>();
@@ -53,5 +75,39 @@ public class StaffRepository {
             staffList.add(staff);
         }
         return staffList;
+    }
+    
+    public boolean deleteStaffById(String staffno) {
+        try {
+            Map<String, Object> result = staffTerminateCall.execute(staffno);
+            return true; // Return true if successful
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false; // Return false if an error occurs
+        }
+    }
+    
+    public boolean hireStaff(Staff staff) {
+    	try {
+        Map<String, Object> result = staffHire.execute(
+                staff.getStaffno(),
+                staff.getFname(),
+                staff.getLname(),
+                staff.getPosition(),
+                staff.getSex(),
+                java.sql.Date.valueOf(staff.getDob()),
+                staff.getSalary(),
+                staff.getBranchno(),
+                staff.getTelephone(),
+                staff.getMobile(),
+                staff.getEmail()
+                
+        );
+
+        return true;
+    	 } catch (Exception e) {
+             e.printStackTrace();
+             return false;
+         }
     }
 }
