@@ -34,4 +34,11 @@ public class StaffService {
 	            return false;
 	        }
 	    }
+	    public Staff getStaffById(String staffno) {
+	        return staffRepository.getStaffById(staffno);
+	    }
+	    
+	    public boolean updateStaff(String staffno, Staff updatedStaff) {
+	        return staffRepository.updateStaffInfo(staffno, updatedStaff);
+	    }
 }

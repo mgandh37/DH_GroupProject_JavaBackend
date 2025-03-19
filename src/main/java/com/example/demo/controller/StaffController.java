@@ -45,5 +45,29 @@ public class StaffController {
             return ResponseEntity.status(500).body(Map.of("success", false, "message", "Failed to hire staff member."));
         }
     }
+    @GetMapping("/{staffno}")
+    public ResponseEntity<?> getStaffById(@PathVariable String staffno) {
+        Staff staff = staffService.getStaffById(staffno);
+        if (staff != null) {
+            return ResponseEntity.ok(staff);
+        } else {
+            return ResponseEntity.status(404).body("Staff member not found.");
+        }
+    }
+    
+    @PutMapping("/{staffno}")
+    public ResponseEntity<?> updateStaff(
+            @PathVariable String staffno, 
+            @RequestBody Staff staffDetails) {
+        
+        boolean isUpdated = staffService.updateStaff(staffno, staffDetails);
+        
+        if (isUpdated) {
+            return ResponseEntity.ok().body(Map.of("success", true, "message", "Staff details updated successfully!"));
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("success", false, "message", "Staff member not found or update failed."));
+        }
+    }
     
 }
