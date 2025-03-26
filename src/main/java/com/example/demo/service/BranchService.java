@@ -20,4 +20,21 @@ public class BranchService {
     public List<Branch> getBranches(String branchNo) {
         return branchRepository.getBranchInfo(branchNo);
     }
+    
+    public boolean addBranch(Branch branch) {
+        return branchRepository.addBranch(
+            branch.getBranchNo(),
+            branch.getStreet(),
+            branch.getCity(),
+            branch.getPostcode()
+        );
+    }
+    
+    public boolean updateBranch(Branch branch) {
+        return branchRepository.updateBranch(branch);
+    }
+
+    public boolean deleteBranch(String branchNo) {
+        return branchRepository.deleteBranch(branchNo);
+    }
 }
