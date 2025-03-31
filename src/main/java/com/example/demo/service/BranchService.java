@@ -1,6 +1,7 @@
 package com.example.demo.service;
 
 import com.example.demo.model.Branch;
+import com.example.demo.model.Staff;
 import com.example.demo.repository.BranchRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,6 +29,10 @@ public class BranchService {
             branch.getCity(),
             branch.getPostcode()
         );
+    }
+    
+    public Branch getBranchById(String branchNo) {
+        return branchRepository.getBranchById(branchNo);
     }
     
     public boolean updateBranch(Branch branch) {

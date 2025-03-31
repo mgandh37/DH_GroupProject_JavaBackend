@@ -1,5 +1,6 @@
 package com.example.demo.controller;
 
+import com.example.demo.model.Branch;
 import com.example.demo.model.Client;
 import com.example.demo.service.ClientService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +27,16 @@ public class ClientController {
     @GetMapping
     public List<Client> getClients(@RequestParam(required = false) String clientNo) {
         return clientService.getClients(clientNo);
+    }
+    
+    @GetMapping("/{clientNo}")
+    public ResponseEntity<?> getClientById(@PathVariable String clientNo) {
+        Client client = clientService.getClientById(clientNo);
+        if (client != null) {
+            return ResponseEntity.ok(client);
+        } else {
+            return ResponseEntity.status(404).body("Branch not found.");
+        }
     }
 
     @PostMapping("/add-client")

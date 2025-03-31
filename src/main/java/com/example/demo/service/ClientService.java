@@ -1,5 +1,6 @@
 package com.example.demo.service;
 
+import com.example.demo.model.Branch;
 import com.example.demo.model.Client;
 import com.example.demo.repository.ClientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,10 @@ public class ClientService {
 
     public List<Client> getClients(String clientNo) {
         return clientRepository.getClients(clientNo);
+    }
+    
+    public Client getClientById(String clientNo) {
+        return clientRepository.getClientById(clientNo);
     }
 
     public boolean addClient(Client client) {

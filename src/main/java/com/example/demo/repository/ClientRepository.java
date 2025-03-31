@@ -1,5 +1,6 @@
 package com.example.demo.repository;
 
+import com.example.demo.model.Branch;
 import com.example.demo.model.Client;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.SqlOutParameter;
@@ -15,6 +16,7 @@ import java.util.*;
 public class ClientRepository {
 
     private final SimpleJdbcCall getClientCall;
+    private final SimpleJdbcCall singleClientInfoCall;
     private final SimpleJdbcCall addClientCall;
     private final SimpleJdbcCall updateClientCall;
     private final SimpleJdbcCall deleteClientCall;
@@ -61,6 +63,12 @@ public class ClientRepository {
                 .declareParameters(
                         new SqlParameter("p_clientno", Types.VARCHAR)
                 );
+        this.singleClientInfoCall = new SimpleJdbcCall(dataSource)
+                .withProcedureName("CLIENT_INFO_SP")
+                .declareParameters(
+                        new SqlParameter("p_clientno", Types.VARCHAR),
+                        new SqlOutParameter("p_rc", Types.REF_CURSOR)
+                );
     }
 
     public List<Client> getClients(String clientNo) {
@@ -86,6 +94,32 @@ public class ClientRepository {
             clients.add(client);
         }
         return clients;
+    }
+    
+    public Client getClientById(String clientNo) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("p_clientno", clientNo);
+
+        Map<String, Object> result = singleClientInfoCall.execute(params);
+        List<Map<String, Object>> rows = (List<Map<String, Object>>) result.get("p_rc");
+
+        if (rows.isEmpty()) {
+            return null;  // No staff found
+        }
+
+        Map<String, Object> row = rows.get(0); // Get the first (and only) result
+        Client client = new Client();
+        client.setClientNo((String) row.get("CLIENTNO"));
+        client.setFname((String) row.get("FNAME"));
+        client.setLname((String) row.get("LNAME"));
+        client.setTelno((String) row.get("TELNO"));
+        client.setStreet((String) row.get("STREET"));
+        client.setCity((String) row.get("CITY"));
+        client.setEmail((String) row.get("EMAIL"));
+        client.setPreftype((String) row.get("PREFTYPE"));
+        client.setMaxrent(((Number) row.get("MAXRENT")).intValue());
+
+        return client;
     }
 
     public boolean addClient(Client client) {

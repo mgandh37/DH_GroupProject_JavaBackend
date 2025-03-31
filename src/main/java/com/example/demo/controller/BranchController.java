@@ -1,6 +1,7 @@
 package com.example.demo.controller;
 
 import com.example.demo.model.Branch;
+import com.example.demo.model.Staff;
 import com.example.demo.service.BranchService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -47,6 +48,16 @@ public class BranchController {
         } else {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("success", false, "message", "Failed to update branch."));
+        }
+    }
+    
+    @GetMapping("/{branchNo}")
+    public ResponseEntity<?> getBranchById(@PathVariable String branchNo) {
+        Branch branch = branchService.getBranchById(branchNo);
+        if (branch != null) {
+            return ResponseEntity.ok(branch);
+        } else {
+            return ResponseEntity.status(404).body("Branch not found.");
         }
     }
 
